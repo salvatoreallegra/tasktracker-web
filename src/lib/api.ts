@@ -1,18 +1,25 @@
-import axios from "axios";
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestHeaders,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
-const api = axios.create({
+const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE,
 });
 
+// In-memory auth token (clears on refresh)
 let accessToken: string | null = null;
 export function setAccessToken(token: string | null) {
   accessToken = token;
 }
 
-api.interceptors.request.use((config) => {
+// Attach Authorization header safely (typed)
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (accessToken) {
-    config.headers = config.headers ?? {};
-    config.headers.Authorization = `Bearer ${accessToken}`;
+    const headers = (config.headers ?? {}) as AxiosRequestHeaders;
+    headers.Authorization = `Bearer ${accessToken}`;
+    config.headers = headers;
   }
   return config;
 });
