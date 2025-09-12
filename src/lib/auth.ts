@@ -18,8 +18,9 @@ export async function login(req: LoginRequest) {
 }
 
 export async function logout() {
-  if (refreshTokenMem)
+  if (refreshTokenMem) {
     await api.post("/auth/logout", { refreshToken: refreshTokenMem });
+  }
   setAccessToken(null);
   refreshTokenMem = null;
 }
@@ -28,6 +29,7 @@ export function isLoggedIn() {
   return !!refreshTokenMem;
 }
 
+// Optional; call if you wire a timer or 401 handler
 export async function refresh() {
   if (!refreshTokenMem) return;
   const { data } = await api.post<AuthResponse>("/auth/refresh", {
