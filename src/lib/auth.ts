@@ -8,7 +8,18 @@ export type AuthResponse = {
 };
 export type RefreshRequest = { refreshToken: string };
 
+// NEW: Register request (add email if your API needs it)
+export type RegisterRequest = {
+  userName: string;
+  password: string /*, email?: string */;
+};
+
 let refreshTokenMem: string | null = null;
+
+// NEW: Register hits your API, no tokens expected back (we'll login after).
+export async function register(req: RegisterRequest) {
+  await api.post("/auth/register", req); // adjust path if your API differs
+}
 
 export async function login(req: LoginRequest) {
   const { data } = await api.post<AuthResponse>("/auth/login", req);
@@ -29,7 +40,6 @@ export function isLoggedIn() {
   return !!refreshTokenMem;
 }
 
-// Optional; call if you wire a timer or 401 handler
 export async function refresh() {
   if (!refreshTokenMem) return;
   const { data } = await api.post<AuthResponse>("/auth/refresh", {
